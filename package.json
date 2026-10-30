@@ -1,0 +1,42 @@
+{
+  "name": "homebridge-datums-schalter",
+  "displayName": "Datums-Schalter",
+  "version": "1.0.0",
+  "description": "Homebridge-Plugin: Schalter, Anwesenheitssensoren und Bewegungsmelder, die an einem Datum oder in einem Datumsbereich automatisch aktiv werden.",
+  "main": "index.js",
+  "license": "MIT",
+  "author": "bbro146",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bbro146/homebridge-datums-schalter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bbro146/homebridge-datums-schalter/issues"
+  },
+  "homepage": "https://github.com/bbro146/homebridge-datums-schalter#readme",
+  "keywords": [
+    "homebridge-plugin",
+    "homebridge",
+    "datum",
+    "date",
+    "schalter",
+    "switch",
+    "occupancy",
+    "motion",
+    "kalender"
+  ],
+  "engines": {
+    "homebridge": "^1.8.0 || ^2.0.0-beta.0 || ^2.0.0",
+    "node": "^18.20.4 || ^20.15.1 || ^22 || ^24"
+  },
+  "files": [
+    "index.js",
+    "config.schema.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node test.js"
+  }
+}

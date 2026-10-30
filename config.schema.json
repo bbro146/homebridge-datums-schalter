@@ -1,0 +1,84 @@
+{
+  "pluginAlias": "DatumsSchalter",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Erstelle beliebig viele Schalter, Anwesenheitssensoren oder Bewegungsmelder, die an einem bestimmten Datum oder in einem Datumsbereich automatisch aktiv werden. Maßgeblich ist das Datum des Homebridge-Servers.",
+  "footerDisplay": "Tipp: Mit „Jährlich wiederholen“ wird nur Tag und Monat verglichen – ideal für Geburtstage, Feiertage oder Zeiträume über den Jahreswechsel (z. B. 20.12. bis 06.01.).",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Plattform-Name",
+        "type": "string",
+        "default": "Datums-Schalter",
+        "required": true
+      },
+      "devices": {
+        "title": "Geräte",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Name",
+              "type": "string",
+              "required": true,
+              "placeholder": "z. B. Weihnachten"
+            },
+            "type": {
+              "title": "Gerätetyp",
+              "type": "string",
+              "default": "switch",
+              "required": true,
+              "oneOf": [
+                { "title": "Schalter", "enum": ["switch"] },
+                { "title": "Anwesenheitssensor", "enum": ["occupancy"] },
+                { "title": "Bewegungsmelder", "enum": ["motion"] }
+              ]
+            },
+            "mode": {
+              "title": "Zeitangabe",
+              "type": "string",
+              "default": "single",
+              "required": true,
+              "oneOf": [
+                { "title": "Einzelnes Datum", "enum": ["single"] },
+                { "title": "Zeitraum (von – bis)", "enum": ["range"] }
+              ]
+            },
+            "date": {
+              "title": "Datum",
+              "type": "string",
+              "format": "date",
+              "condition": {
+                "functionBody": "return model.devices && model.devices[arrayIndices] && model.devices[arrayIndices].mode !== 'range';"
+              }
+            },
+            "startDate": {
+              "title": "Von (Startdatum, inklusive)",
+              "type": "string",
+              "format": "date",
+              "condition": {
+                "functionBody": "return model.devices && model.devices[arrayIndices] && model.devices[arrayIndices].mode === 'range';"
+              }
+            },
+            "endDate": {
+              "title": "Bis (Enddatum, inklusive)",
+              "type": "string",
+              "format": "date",
+              "condition": {
+                "functionBody": "return model.devices && model.devices[arrayIndices] && model.devices[arrayIndices].mode === 'range';"
+              }
+            },
+            "yearly": {
+              "title": "Jährlich wiederholen",
+              "description": "Nur Tag und Monat vergleichen – die Jahreszahl wird ignoriert.",
+              "type": "boolean",
+              "default": false
+            }
+          }
+        }
+      }
+    }
+  }
+}
