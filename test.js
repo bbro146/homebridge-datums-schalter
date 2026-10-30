@@ -1,6 +1,6 @@
 'use strict';
 const assert = require('assert');
-const { isActive, normalizeDate } = require('./index');
+const { isActive, normalizeDate, extendToWeekends } = require('./index');
 
 const d = (s) => new Date(`${s}T12:00:00`);
 
@@ -35,5 +35,34 @@ assert.strictEqual(isActive({ mode: 'single' }, d('2026-12-24')), null);
 assert.strictEqual(isActive({ mode: 'range', startDate: '2026-12-24', endDate: '2026-12-01' }, d('2026-12-10')), null);
 assert.strictEqual(normalizeDate('2026-02-30'), null);
 assert.strictEqual(normalizeDate('2028-02-29'), '2028-02-29');
+
+// Schulferien
+const H = [
+  { name: 'Herbstferien', start: '2026-10-12', end: '2026-10-24' }, // Mo – Sa
+  { name: 'Weihnachtsferien', start: '2026-12-21', end: '2027-01-02' },
+  { name: 'Sommerferien', start: '2027-07-05', end: '2027-08-13' }, // Mo – Fr
+];
+const sh = { mode: 'schoolHolidays', state: 'SN' };
+assert.strictEqual(isActive(sh, d('2026-10-12'), H), true);
+assert.strictEqual(isActive(sh, d('2026-10-24'), H), true);
+assert.strictEqual(isActive(sh, d('2026-10-25'), H), false);
+assert.strictEqual(isActive(sh, d('2026-12-31'), H), true);
+assert.strictEqual(isActive(sh, d('2027-01-03'), H), false);
+assert.strictEqual(isActive(sh, d('2026-10-30'), H), false);
+assert.strictEqual(isActive(sh, d('2026-10-12'), null), null);
+
+// Filter nur Sommer
+const shSommer = { ...sh, holidayKinds: ['sommer'] };
+assert.strictEqual(isActive(shSommer, d('2026-10-12'), H), false);
+assert.strictEqual(isActive(shSommer, d('2027-07-10'), H), true);
+
+// Wochenenden einbeziehen
+assert.deepStrictEqual(extendToWeekends({ start: '2027-07-05', end: '2027-08-13' }), { start: '2027-07-03', end: '2027-08-15' });
+assert.deepStrictEqual(extendToWeekends({ start: '2026-10-12', end: '2026-10-24' }), { start: '2026-10-10', end: '2026-10-25' });
+const shWe = { ...sh, includeWeekends: true };
+assert.strictEqual(isActive(shWe, d('2027-07-03'), H), true);
+assert.strictEqual(isActive(shWe, d('2027-08-15'), H), true);
+assert.strictEqual(isActive(shWe, d('2027-08-16'), H), false);
+assert.strictEqual(isActive(sh, d('2027-07-03'), H), false);
 
 console.log('Alle Tests bestanden ✔');

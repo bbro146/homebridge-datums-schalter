@@ -1,8 +1,8 @@
 {
   "name": "homebridge-datums-schalter",
   "displayName": "Datums-Schalter",
-  "version": "1.0.0",
-  "description": "Homebridge-Plugin: Schalter, Anwesenheitssensoren und Bewegungsmelder, die an einem Datum oder in einem Datumsbereich automatisch aktiv werden.",
+  "version": "1.1.0",
+  "description": "Homebridge-Plugin: Schalter, Anwesenheitssensoren und Bewegungsmelder, die an einem Datum, in einem Datumsbereich oder in den Schulferien (automatisch, je Bundesland) aktiv werden.",
   "main": "index.js",
   "license": "MIT",
   "author": "bbro146",
@@ -23,7 +23,11 @@
     "switch",
     "occupancy",
     "motion",
-    "kalender"
+    "kalender",
+    "schulferien",
+    "ferien",
+    "school-holidays",
+    "bundesland"
   ],
   "engines": {
     "homebridge": "^1.8.0 || ^2.0.0-beta.0 || ^2.0.0",

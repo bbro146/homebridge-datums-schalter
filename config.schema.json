@@ -2,8 +2,8 @@
   "pluginAlias": "DatumsSchalter",
   "pluginType": "platform",
   "singular": true,
-  "headerDisplay": "Erstelle beliebig viele Schalter, Anwesenheitssensoren oder Bewegungsmelder, die an einem bestimmten Datum oder in einem Datumsbereich automatisch aktiv werden. Maßgeblich ist das Datum des Homebridge-Servers.",
-  "footerDisplay": "Tipp: Mit „Jährlich wiederholen“ wird nur Tag und Monat verglichen – ideal für Geburtstage, Feiertage oder Zeiträume über den Jahreswechsel (z. B. 20.12. bis 06.01.).",
+  "headerDisplay": "Erstelle beliebig viele Schalter, Anwesenheitssensoren oder Bewegungsmelder, die an einem bestimmten Datum, in einem Datumsbereich oder in den Schulferien deines Bundeslandes automatisch aktiv werden. Maßgeblich ist das Datum des Homebridge-Servers.",
+  "footerDisplay": "Schulferien werden automatisch von openholidaysapi.org geladen (Ersatz: ferien-api.de), alle 12 Stunden aktualisiert und lokal zwischengespeichert. „Jährlich wiederholen“ vergleicht nur Tag und Monat – ideal für Geburtstage oder Zeiträume über den Jahreswechsel.",
   "schema": {
     "type": "object",
     "properties": {
@@ -43,7 +43,8 @@
               "required": true,
               "oneOf": [
                 { "title": "Einzelnes Datum", "enum": ["single"] },
-                { "title": "Zeitraum (von – bis)", "enum": ["range"] }
+                { "title": "Zeitraum (von – bis)", "enum": ["range"] },
+                { "title": "Schulferien (automatisch)", "enum": ["schoolHolidays"] }
               ]
             },
             "date": {
@@ -51,7 +52,7 @@
               "type": "string",
               "format": "date",
               "condition": {
-                "functionBody": "return model.devices && model.devices[arrayIndices] && model.devices[arrayIndices].mode !== 'range';"
+                "functionBody": "return model.devices && model.devices[arrayIndices] && (model.devices[arrayIndices].mode || 'single') === 'single';"
               }
             },
             "startDate": {
@@ -74,7 +75,63 @@
               "title": "Jährlich wiederholen",
               "description": "Nur Tag und Monat vergleichen – die Jahreszahl wird ignoriert.",
               "type": "boolean",
-              "default": false
+              "default": false,
+              "condition": {
+                "functionBody": "return model.devices && model.devices[arrayIndices] && model.devices[arrayIndices].mode !== 'schoolHolidays';"
+              }
+            },
+            "state": {
+              "title": "Bundesland",
+              "type": "string",
+              "condition": {
+                "functionBody": "return model.devices && model.devices[arrayIndices] && model.devices[arrayIndices].mode === 'schoolHolidays';"
+              },
+              "oneOf": [
+                { "title": "Baden-Württemberg", "enum": ["BW"] },
+                { "title": "Bayern", "enum": ["BY"] },
+                { "title": "Berlin", "enum": ["BE"] },
+                { "title": "Brandenburg", "enum": ["BB"] },
+                { "title": "Bremen", "enum": ["HB"] },
+                { "title": "Hamburg", "enum": ["HH"] },
+                { "title": "Hessen", "enum": ["HE"] },
+                { "title": "Mecklenburg-Vorpommern", "enum": ["MV"] },
+                { "title": "Niedersachsen", "enum": ["NI"] },
+                { "title": "Nordrhein-Westfalen", "enum": ["NW"] },
+                { "title": "Rheinland-Pfalz", "enum": ["RP"] },
+                { "title": "Saarland", "enum": ["SL"] },
+                { "title": "Sachsen", "enum": ["SN"] },
+                { "title": "Sachsen-Anhalt", "enum": ["ST"] },
+                { "title": "Schleswig-Holstein", "enum": ["SH"] },
+                { "title": "Thüringen", "enum": ["TH"] }
+              ]
+            },
+            "holidayKinds": {
+              "title": "Nur bestimmte Ferien (leer = alle Schulferien)",
+              "type": "array",
+              "uniqueItems": true,
+              "condition": {
+                "functionBody": "return model.devices && model.devices[arrayIndices] && model.devices[arrayIndices].mode === 'schoolHolidays';"
+              },
+              "items": {
+                "type": "string",
+                "oneOf": [
+                  { "title": "Winterferien", "enum": ["winter"] },
+                  { "title": "Osterferien", "enum": ["oster"] },
+                  { "title": "Pfingstferien", "enum": ["pfingst"] },
+                  { "title": "Sommerferien", "enum": ["sommer"] },
+                  { "title": "Herbstferien", "enum": ["herbst"] },
+                  { "title": "Weihnachtsferien", "enum": ["weihnacht"] }
+                ]
+              }
+            },
+            "includeWeekends": {
+              "title": "Angrenzende Wochenenden einbeziehen",
+              "description": "Aktiv schon ab dem Samstag vor Ferienbeginn bis zum Sonntag nach Ferienende.",
+              "type": "boolean",
+              "default": false,
+              "condition": {
+                "functionBody": "return model.devices && model.devices[arrayIndices] && model.devices[arrayIndices].mode === 'schoolHolidays';"
+              }
             }
           }
         }
